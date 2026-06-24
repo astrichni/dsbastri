@@ -1,0 +1,36 @@
+---
+title: "Exploring Storms"
+author: "Astri Cahyani"
+execute:
+  echo: false
+---
+
+```{r setup}
+suppressPackageStartupMessages(library(tidyverse))
+```
+
+This analysis explores the historical `storms` dataset from the **dplyr** package, tracking storm activity from 1975 to 2024.
+
+## Annual Storm Counts
+
+Below is a visualization of the total number of unique named storms recorded each year.
+
+```{r plot-storms}
+storms %>%
+  group_by(year) %>%
+  summarize(n_storms = n_distinct(name), .groups = "drop") %>%
+  ggplot(aes(x = year, y = n_storms)) +
+  geom_line(color = "dodgerblue", linewidth = 1) +
+  geom_point(color = "dodgerblue4", size = 2) +
+  labs(
+    title = "Number of Named Storms per Year",
+    subtitle = "Data from 1975 to 2024",
+    x = "Year",
+    y = "Number of Named Storms"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 16),
+    plot.title.position = "plot"
+  )
+```

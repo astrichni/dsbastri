@@ -1,1 +1,15 @@
-quarto-1_files
+# Quarto metadata and temporary build directories
+.quarto/
+*_files/
+
+# Quarto cache directories
+*_cache/
+
+# R-specific files
+.Rhistory
+.RData
+.Ruserdata
+.Rproj.user/
+
+# Ensure HTML files are not ignored
+!*.html
