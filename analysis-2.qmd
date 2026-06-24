@@ -1,0 +1,199 @@
+---
+title: "Analyzing Music Data"
+author: "Astri Cahyani"
+execute:
+  echo: false
+---
+
+
+```{r}
+#| message: false
+library(tidyverse)
+```
+
+```{r}
+billboard %>% 
+  select(artist, track, date.entered, wk1, wk2, wk3, wk4)
+```
+```{r}
+billboard %>% 
+  summarize(
+    min = min(date.entered),
+    max = max(date.entered)
+  )
+```
+```{r}
+#| message: false
+ggplot(billboard, aes(x = wk1)) +
+  geom_histogram(binwidth = 5, fill = "steelblue", color = "white") +
+  labs(
+    title = "Histogram of Week 1 Rankings",
+    subtitle = paste("Number of values:", sum(!is.na(billboard$wk1))),
+    x = "Week 1 Rank",
+    y = "Count"
+  )
+```
+```{r}
+#| message: false
+ggplot(billboard, aes(x = wk6)) +
+  geom_histogram(binwidth = 5, fill = "steelblue", color = "white") +
+  labs(
+    title = "Histogram of Week 6 Rankings",
+    subtitle = paste("Number of values:", sum(!is.na(billboard$wk6))),
+    x = "Week 6 Rank",
+    y = "Count"
+  )
+```
+```{r}
+billboard %>%
+  select(wk1, wk4, wk10, wk20, wk40, wk76) %>%
+  pivot_longer(cols = everything(), names_to = "week", values_to = "rank") %>%
+  mutate(week = factor(week, levels = c("wk1", "wk4", "wk10", "wk20", "wk40", "wk76"))) %>%
+  group_by(week) %>%
+  summarize(
+    present = sum(!is.na(rank)),
+    missing = sum(is.na(rank))
+  )
+```
+```{r}
+billboard %>%
+  pivot_longer(
+    cols = starts_with("wk"),
+    names_to = "week",
+    values_to = "rank"
+  ) %>%
+  mutate(week_num = as.integer(str_remove(week, "wk"))) %>%
+  group_by(artist, track) %>%
+  summarize(
+    reentered = any(is.na(rank) & week_num < max(week_num[!is.na(rank)])),
+    .groups = "drop"
+  ) %>%
+  count(reentered)
+```
+```{r}
+# Count of songs by category of rank change between week 1 and week 6
+billboard %>%
+  mutate(
+    change_category = case_when(
+      is.na(wk6) ~ "missing by week 6",
+      wk6 < wk1  ~ "improved",
+      wk6 == wk1 ~ "stayed the same",
+      wk6 > wk1  ~ "got worse"
+    )
+  ) %>%
+  count(change_category)
+
+# Median rank change (wk6 - wk1) for songs present in both weeks
+billboard %>%
+  filter(!is.na(wk1), !is.na(wk6)) %>%
+  summarize(
+    median_change = median(wk6 - wk1)
+  )
+```
+```{r}
+#| cache: true
+# Reshape to long format and plot each song's ranking over time
+billboard_long <- billboard %>%
+  pivot_longer(
+    cols = starts_with("wk"),
+    names_to = "week",
+    values_to = "rank",
+    values_drop_na = TRUE
+  ) %>%
+  mutate(week_num = as.integer(str_remove(week, "wk")))
+
+ggplot(billboard_long, aes(x = week_num, y = rank, group = interaction(artist, track))) +
+  geom_line(alpha = 0.2, color = "steelblue") +
+  scale_y_reverse() +
+  labs(
+    title = "Billboard Song Rankings Over Time",
+    x = "Week on Chart",
+    y = "Rank (Reversed)"
+  )
+```
+```{r}
+# Create the song-level summary
+song_summary <- billboard %>%
+  pivot_longer(
+    cols = starts_with("wk"),
+    names_to = "week",
+    values_to = "rank",
+    values_drop_na = TRUE
+  ) %>%
+  mutate(week_num = as.integer(str_remove(week, "wk"))) %>%
+  group_by(artist, track) %>%
+  summarize(
+    first_rank = rank[week_num == 1],
+    best_rank = min(rank),
+    first_week_at_best = min(week_num[rank == best_rank]),
+    total_weeks = n(),
+    .groups = "drop"
+  )
+
+# Display a preview of the song summary (first few rows)
+head(song_summary)
+
+# Identify the three notable top-10 songs
+fastest_no1 <- song_summary %>%
+  filter(best_rank == 1) %>%
+  slice_min(first_week_at_best, n = 1)
+
+slowest_no1 <- song_summary %>%
+  filter(best_rank == 1) %>%
+  slice_max(first_week_at_best, n = 1)
+
+longest_run_top10 <- song_summary %>%
+  filter(best_rank <= 10) %>%
+  slice_max(total_weeks, n = 1)
+
+# Print the three notable songs in a summary table
+bind_rows(
+  mutate(fastest_no1, note = "Fastest to #1"),
+  mutate(slowest_no1, note = "Slowest to #1"),
+  mutate(longest_run_top10, note = "Longest run top-10")
+) %>%
+  select(note, artist, track, first_rank, best_rank, first_week_at_best, total_weeks)
+```
+```{r}
+# Filter to only the songs that reached the top 10 at some point
+top10_songs <- billboard_long %>%
+  group_by(artist, track) %>%
+  filter(min(rank) <= 10) %>%
+  ungroup() %>%
+  mutate(
+    highlight = case_when(
+      artist == "Madonna" & track == "Music" ~ "Madonna - Music (Fastest to #1)",
+      artist == "Lonestar" & track == "Amazed" ~ "Lonestar - Amazed (Slowest to #1)",
+      artist == "Creed" & track == "Higher" ~ "Creed - Higher (Longest Top-10 Run)",
+      TRUE ~ "Other Top-10 Songs"
+    )
+  )
+
+# Plot the top-10 songs with highlighting
+ggplot(top10_songs, aes(x = week_num, y = rank, group = interaction(artist, track), color = highlight)) +
+  # Render the gray lines first
+  geom_line(data = filter(top10_songs, highlight == "Other Top-10 Songs"), alpha = 0.4) +
+  # Render the colored highlight lines on top
+  geom_line(data = filter(top10_songs, highlight != "Other Top-10 Songs"), linewidth = 1.2) +
+  scale_y_reverse() +
+  scale_color_manual(
+    values = c(
+      "Madonna - Music (Fastest to #1)" = "#E41A1C",
+      "Lonestar - Amazed (Slowest to #1)" = "#377EB8",
+      "Creed - Higher (Longest Top-10 Run)" = "#4DAF4C",
+      "Other Top-10 Songs" = "#D3D3D3"
+    ),
+    breaks = c(
+      "Madonna - Music (Fastest to #1)",
+      "Lonestar - Amazed (Slowest to #1)",
+      "Creed - Higher (Longest Top-10 Run)"
+    )
+  ) +
+  labs(
+    title = "Top-10 Songs on the Billboard Chart",
+    subtitle = "Highlighting three notable songs",
+    x = "Week on Chart",
+    y = "Rank (Reversed)",
+    color = "Notable Songs"
+  )
+```

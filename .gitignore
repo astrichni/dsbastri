@@ -2,3 +2,11 @@ analysis_files
 analysis_cache/
 .quarto
 quarto-1_files
+
+analysis-2_files
+analysis-2_cache/
+.quarto
+quarto-1_files
+
+/.quarto/
+**/*.quarto_ipynb
