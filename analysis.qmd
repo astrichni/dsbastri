@@ -11,26 +11,42 @@ suppressPackageStartupMessages(library(tidyverse))
 
 This analysis explores the historical `storms` dataset from the **dplyr** package, tracking storm activity from 1975 to 2024.
 
-## Annual Storm Counts
+## Annual Storm Counts by Type
 
-Below is a visualization of the total number of unique named storms recorded each year.
+Below is a stacked area chart showing the count of each storm type per year. The data is filtered to tropical depressions, tropical storms, and hurricanes.
 
 ```{r plot-storms}
 storms %>%
-  group_by(year) %>%
+  filter(status %in% c("tropical depression", "tropical storm", "hurricane")) %>%
+  mutate(status = factor(status, levels = c("tropical depression", "tropical storm", "hurricane"))) %>%
+  group_by(year, status) %>%
   summarize(n_storms = n_distinct(name), .groups = "drop") %>%
-  ggplot(aes(x = year, y = n_storms)) +
-  geom_line(color = "dodgerblue", linewidth = 1) +
-  geom_point(color = "dodgerblue4", size = 2) +
+  complete(year, status, fill = list(n_storms = 0)) %>%
+  ggplot(aes(x = year, y = n_storms, fill = status)) +
+  geom_area(alpha = 0.85, color = "white", linewidth = 0.2) +
+  scale_fill_manual(
+    values = c(
+      "tropical depression" = "#9ECAE1",
+      "tropical storm" = "#FD8D3C",
+      "hurricane" = "#B30000"
+    ),
+    labels = c(
+      "tropical depression" = "Tropical Depression",
+      "tropical storm" = "Tropical Storm",
+      "hurricane" = "Hurricane"
+    )
+  ) +
   labs(
-    title = "Number of Named Storms per Year",
-    subtitle = "Data from 1975 to 2024",
+    title = "Named Storms per Year by Type",
+    subtitle = "Data from 1975 to 2024 (Filtered to Depressions, Storms, and Hurricanes)",
     x = "Year",
-    y = "Number of Named Storms"
+    y = "Number of Named Storms",
+    fill = "Storm Type"
   ) +
   theme_minimal() +
   theme(
     plot.title = element_text(face = "bold", size = 16),
-    plot.title.position = "plot"
+    plot.title.position = "plot",
+    legend.position = "bottom"
   )
 ```
