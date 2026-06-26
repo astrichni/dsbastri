@@ -1,0 +1,230 @@
+/* Import premium Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* Apply modern typography and custom variables */
+:root {
+  --font-heading: 'Outfit', system-ui, -apple-system, sans-serif;
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+  --transition-smooth: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  --primary-glow: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  --success-glow: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  --info-glow: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+}
+
+body {
+  font-family: var(--font-body);
+  line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+}
+
+/* Navbar customization */
+.navbar {
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.75rem 1rem;
+}
+
+/* Beautiful Hero Header for Home Page */
+.hero-section {
+  background: radial-gradient(circle at 90% 10%, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.05) 50%, transparent 100%);
+  padding: 5rem 2rem;
+  border-radius: 24px;
+  margin-bottom: 3rem;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.dark .hero-section {
+  background: radial-gradient(circle at 90% 10%, rgba(99, 102, 241, 0.15) 0%, rgba(168, 85, 247, 0.08) 50%, transparent 100%);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.hero-title {
+  font-size: 3.5rem;
+  font-weight: 800;
+  line-height: 1.15;
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 1.5rem;
+  letter-spacing: -0.02em;
+}
+
+.hero-subtitle {
+  font-size: 1.25rem;
+  color: #4b5563;
+  max-width: 700px;
+  margin-bottom: 2rem;
+}
+
+.dark .hero-subtitle {
+  color: #9ca3af;
+}
+
+/* Stunning Dashboard / Portfolio Cards */
+.portfolio-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-bottom: 4rem;
+}
+
+.portfolio-card {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 20px;
+  padding: 2rem;
+  transition: var(--transition-smooth);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
+  position: relative;
+  text-decoration: none !important;
+  color: inherit !important;
+}
+
+.dark .portfolio-card {
+  background: rgba(30, 41, 59, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.2);
+}
+
+.portfolio-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.1);
+  border-color: rgba(99, 102, 241, 0.3);
+}
+
+.dark .portfolio-card:hover {
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.4);
+  border-color: rgba(168, 85, 247, 0.3);
+}
+
+.card-tag {
+  align-self: flex-start;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  margin-bottom: 1.25rem;
+  letter-spacing: 0.05em;
+  color: white;
+}
+
+.tag-sports {
+  background: var(--primary-glow);
+}
+
+.tag-songs {
+  background: var(--success-glow);
+}
+
+.tag-charts {
+  background: var(--info-glow);
+}
+
+.card-title {
+  font-size: 1.5rem;
+  margin-bottom: 0.75rem;
+  font-weight: 700;
+}
+
+.card-description {
+  font-size: 0.95rem;
+  color: #4b5563;
+  flex-grow: 1;
+  margin-bottom: 1.5rem;
+}
+
+.dark .card-description {
+  color: #9ca3af;
+}
+
+.card-link {
+  font-weight: 600;
+  font-size: 0.95rem;
+  display: inline-flex;
+  align-items: center;
+  color: #6366f1;
+  transition: var(--transition-smooth);
+}
+
+.dark .card-link {
+  color: #a855f7;
+}
+
+.portfolio-card:hover .card-link {
+  padding-left: 6px;
+}
+
+/* Styles for NBA Scorigami container in scores.qmd */
+.scorigami-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1rem;
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.8) 0%, rgba(226, 232, 240, 0.5) 100%);
+  border-radius: 24px;
+  margin: 2rem 0;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: inset 0 0 40px rgba(255, 255, 255, 0.5);
+}
+
+.dark .scorigami-wrapper {
+  background: radial-gradient(circle at center, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.5) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.2);
+}
+
+/* Center all child elements under scorigami-wrapper */
+.scorigami-wrapper .cell, 
+.scorigami-wrapper .cell-output-display, 
+.scorigami-wrapper .cell-output-display > div,
+.scorigami-wrapper .figure {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.scorigami-wrapper img.figure-img {
+  width: 80vmin !important;
+  height: 80vmin !important;
+  max-width: 750px !important;
+  max-height: 750px !important;
+  box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.15) !important;
+  border-radius: 20px;
+  background-color: white !important;
+  padding: 16px !important;
+  transition: var(--transition-smooth);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.dark .scorigami-wrapper img.figure-img {
+  background-color: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.05);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4) !important;
+}
+
+.scorigami-wrapper img.figure-img:hover {
+  transform: translateY(-8px) scale(1.01);
+  box-shadow: 0 35px 60px -15px rgba(15, 23, 42, 0.25) !important;
+}
+
+.dark .scorigami-wrapper img.figure-img:hover {
+  box-shadow: 0 35px 60px -15px rgba(0, 0, 0, 0.6) !important;
+}
