@@ -296,10 +296,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
     <a class="nav-link" href="./index.html"> 
-<span class="menu-text">Home</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="./scores.html"> 
 <span class="menu-text">NBA Scorigami</span></a>
   </li>  
   <li class="nav-item">
@@ -322,8 +318,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#year-2000-billboard-chart-insights" id="toc-year-2000-billboard-chart-insights" class="nav-link active" data-scroll-target="#year-2000-billboard-chart-insights">Year 2000 Billboard Chart Insights</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -471,6 +473,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 3 Longest run … Creed  High…         81         7                 46          57</code></pre>
 </div>
 </div>
+<section id="year-2000-billboard-chart-insights" class="level3 insights-box">
+<h3 class="anchored" data-anchor-id="year-2000-billboard-chart-insights">Year 2000 Billboard Chart Insights</h3>
+<p>An analysis of the <strong>317 tracks</strong> entering the Billboard Hot 100 in the year 2000 reveals three standout records:</p>
+<ul>
+<li><strong>Fastest Climb to #1:</strong> Madonna’s <em>“Music”</em> reached the top spot in just <strong>6 weeks</strong> (entering the chart at #41).</li>
+<li><strong>Slowest Climb to #1:</strong> Lonestar’s <em>“Amazed”</em> took <strong>40 weeks</strong> of climbing to reach #1 (entering at #81).</li>
+<li><strong>Longest Run on Chart:</strong> Creed’s <em>“Higher”</em> set the endurance record, spending <strong>57 weeks</strong> on the chart (peaking at #7).</li>
+</ul>
+</section>
 <div class="cell">
 <div class="cell-output-display">
 <div>
@@ -1106,49 +1117,59 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb10-174"><a href="#cb10-174" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
 <span id="cb10-175"><a href="#cb10-175" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(note, artist, track, first_rank, best_rank, first_week_at_best, total_weeks)</span>
 <span id="cb10-176"><a href="#cb10-176" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb10-179"><a href="#cb10-179" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb10-180"><a href="#cb10-180" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter to only the songs that reached the top 10 at some point</span></span>
-<span id="cb10-181"><a href="#cb10-181" aria-hidden="true" tabindex="-1"></a>top10_songs <span class="ot">&lt;-</span> billboard_long <span class="sc">%&gt;%</span></span>
-<span id="cb10-182"><a href="#cb10-182" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(artist, track) <span class="sc">%&gt;%</span></span>
-<span id="cb10-183"><a href="#cb10-183" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">min</span>(rank) <span class="sc">&lt;=</span> <span class="dv">10</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb10-184"><a href="#cb10-184" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb10-185"><a href="#cb10-185" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb10-186"><a href="#cb10-186" aria-hidden="true" tabindex="-1"></a>    <span class="at">highlight =</span> <span class="fu">case_when</span>(</span>
-<span id="cb10-187"><a href="#cb10-187" aria-hidden="true" tabindex="-1"></a>      artist <span class="sc">==</span> <span class="st">"Madonna"</span> <span class="sc">&amp;</span> track <span class="sc">==</span> <span class="st">"Music"</span> <span class="sc">~</span> <span class="st">"Madonna - Music (Fastest to #1)"</span>,</span>
-<span id="cb10-188"><a href="#cb10-188" aria-hidden="true" tabindex="-1"></a>      artist <span class="sc">==</span> <span class="st">"Lonestar"</span> <span class="sc">&amp;</span> track <span class="sc">==</span> <span class="st">"Amazed"</span> <span class="sc">~</span> <span class="st">"Lonestar - Amazed (Slowest to #1)"</span>,</span>
-<span id="cb10-189"><a href="#cb10-189" aria-hidden="true" tabindex="-1"></a>      artist <span class="sc">==</span> <span class="st">"Creed"</span> <span class="sc">&amp;</span> track <span class="sc">==</span> <span class="st">"Higher"</span> <span class="sc">~</span> <span class="st">"Creed - Higher (Longest Top-10 Run)"</span>,</span>
-<span id="cb10-190"><a href="#cb10-190" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">"Other Top-10 Songs"</span></span>
-<span id="cb10-191"><a href="#cb10-191" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb10-192"><a href="#cb10-192" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb10-193"><a href="#cb10-193" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-194"><a href="#cb10-194" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot the top-10 songs with highlighting</span></span>
-<span id="cb10-195"><a href="#cb10-195" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(top10_songs, <span class="fu">aes</span>(<span class="at">x =</span> week_num, <span class="at">y =</span> rank, <span class="at">group =</span> <span class="fu">interaction</span>(artist, track), <span class="at">color =</span> highlight)) <span class="sc">+</span></span>
-<span id="cb10-196"><a href="#cb10-196" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Render the gray lines first</span></span>
-<span id="cb10-197"><a href="#cb10-197" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> <span class="fu">filter</span>(top10_songs, highlight <span class="sc">==</span> <span class="st">"Other Top-10 Songs"</span>), <span class="at">alpha =</span> <span class="fl">0.4</span>) <span class="sc">+</span></span>
-<span id="cb10-198"><a href="#cb10-198" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Render the colored highlight lines on top</span></span>
-<span id="cb10-199"><a href="#cb10-199" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> <span class="fu">filter</span>(top10_songs, highlight <span class="sc">!=</span> <span class="st">"Other Top-10 Songs"</span>), <span class="at">linewidth =</span> <span class="fl">1.2</span>) <span class="sc">+</span></span>
-<span id="cb10-200"><a href="#cb10-200" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_reverse</span>() <span class="sc">+</span></span>
-<span id="cb10-201"><a href="#cb10-201" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(</span>
-<span id="cb10-202"><a href="#cb10-202" aria-hidden="true" tabindex="-1"></a>    <span class="at">values =</span> <span class="fu">c</span>(</span>
-<span id="cb10-203"><a href="#cb10-203" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Madonna - Music (Fastest to #1)"</span> <span class="ot">=</span> <span class="st">"#E41A1C"</span>,</span>
-<span id="cb10-204"><a href="#cb10-204" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Lonestar - Amazed (Slowest to #1)"</span> <span class="ot">=</span> <span class="st">"#377EB8"</span>,</span>
-<span id="cb10-205"><a href="#cb10-205" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Creed - Higher (Longest Top-10 Run)"</span> <span class="ot">=</span> <span class="st">"#4DAF4C"</span>,</span>
-<span id="cb10-206"><a href="#cb10-206" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Other Top-10 Songs"</span> <span class="ot">=</span> <span class="st">"#D3D3D3"</span></span>
-<span id="cb10-207"><a href="#cb10-207" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb10-208"><a href="#cb10-208" aria-hidden="true" tabindex="-1"></a>    <span class="at">breaks =</span> <span class="fu">c</span>(</span>
-<span id="cb10-209"><a href="#cb10-209" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Madonna - Music (Fastest to #1)"</span>,</span>
-<span id="cb10-210"><a href="#cb10-210" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Lonestar - Amazed (Slowest to #1)"</span>,</span>
-<span id="cb10-211"><a href="#cb10-211" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Creed - Higher (Longest Top-10 Run)"</span></span>
-<span id="cb10-212"><a href="#cb10-212" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb10-213"><a href="#cb10-213" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb10-214"><a href="#cb10-214" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb10-215"><a href="#cb10-215" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Top-10 Songs on the Billboard Chart"</span>,</span>
-<span id="cb10-216"><a href="#cb10-216" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Highlighting three notable songs"</span>,</span>
-<span id="cb10-217"><a href="#cb10-217" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Week on Chart"</span>,</span>
-<span id="cb10-218"><a href="#cb10-218" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Rank (Reversed)"</span>,</span>
-<span id="cb10-219"><a href="#cb10-219" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"Notable Songs"</span></span>
-<span id="cb10-220"><a href="#cb10-220" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb10-221"><a href="#cb10-221" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb10-177"><a href="#cb10-177" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-178"><a href="#cb10-178" aria-hidden="true" tabindex="-1"></a>::: {.insights-box}</span>
+<span id="cb10-179"><a href="#cb10-179" aria-hidden="true" tabindex="-1"></a><span class="fu">### Year 2000 Billboard Chart Insights</span></span>
+<span id="cb10-180"><a href="#cb10-180" aria-hidden="true" tabindex="-1"></a>An analysis of the **317 tracks** entering the Billboard Hot 100 in the year 2000 reveals three standout records:</span>
+<span id="cb10-181"><a href="#cb10-181" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-182"><a href="#cb10-182" aria-hidden="true" tabindex="-1"></a><span class="ss">*   </span>**Fastest Climb to #1:** Madonna’s *"Music"* reached the top spot in just **6 weeks** (entering the chart at #41).</span>
+<span id="cb10-183"><a href="#cb10-183" aria-hidden="true" tabindex="-1"></a><span class="ss">*   </span>**Slowest Climb to #1:** Lonestar’s *"Amazed"* took **40 weeks** of climbing to reach #1 (entering at #81).</span>
+<span id="cb10-184"><a href="#cb10-184" aria-hidden="true" tabindex="-1"></a><span class="ss">*   </span>**Longest Run on Chart:** Creed’s *"Higher"* set the endurance record, spending **57 weeks** on the chart (peaking at #7).</span>
+<span id="cb10-185"><a href="#cb10-185" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb10-186"><a href="#cb10-186" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-189"><a href="#cb10-189" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb10-190"><a href="#cb10-190" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter to only the songs that reached the top 10 at some point</span></span>
+<span id="cb10-191"><a href="#cb10-191" aria-hidden="true" tabindex="-1"></a>top10_songs <span class="ot">&lt;-</span> billboard_long <span class="sc">%&gt;%</span></span>
+<span id="cb10-192"><a href="#cb10-192" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(artist, track) <span class="sc">%&gt;%</span></span>
+<span id="cb10-193"><a href="#cb10-193" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">min</span>(rank) <span class="sc">&lt;=</span> <span class="dv">10</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb10-194"><a href="#cb10-194" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb10-195"><a href="#cb10-195" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb10-196"><a href="#cb10-196" aria-hidden="true" tabindex="-1"></a>    <span class="at">highlight =</span> <span class="fu">case_when</span>(</span>
+<span id="cb10-197"><a href="#cb10-197" aria-hidden="true" tabindex="-1"></a>      artist <span class="sc">==</span> <span class="st">"Madonna"</span> <span class="sc">&amp;</span> track <span class="sc">==</span> <span class="st">"Music"</span> <span class="sc">~</span> <span class="st">"Madonna - Music (Fastest to #1)"</span>,</span>
+<span id="cb10-198"><a href="#cb10-198" aria-hidden="true" tabindex="-1"></a>      artist <span class="sc">==</span> <span class="st">"Lonestar"</span> <span class="sc">&amp;</span> track <span class="sc">==</span> <span class="st">"Amazed"</span> <span class="sc">~</span> <span class="st">"Lonestar - Amazed (Slowest to #1)"</span>,</span>
+<span id="cb10-199"><a href="#cb10-199" aria-hidden="true" tabindex="-1"></a>      artist <span class="sc">==</span> <span class="st">"Creed"</span> <span class="sc">&amp;</span> track <span class="sc">==</span> <span class="st">"Higher"</span> <span class="sc">~</span> <span class="st">"Creed - Higher (Longest Top-10 Run)"</span>,</span>
+<span id="cb10-200"><a href="#cb10-200" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">"Other Top-10 Songs"</span></span>
+<span id="cb10-201"><a href="#cb10-201" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb10-202"><a href="#cb10-202" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb10-203"><a href="#cb10-203" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-204"><a href="#cb10-204" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot the top-10 songs with highlighting</span></span>
+<span id="cb10-205"><a href="#cb10-205" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(top10_songs, <span class="fu">aes</span>(<span class="at">x =</span> week_num, <span class="at">y =</span> rank, <span class="at">group =</span> <span class="fu">interaction</span>(artist, track), <span class="at">color =</span> highlight)) <span class="sc">+</span></span>
+<span id="cb10-206"><a href="#cb10-206" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Render the gray lines first</span></span>
+<span id="cb10-207"><a href="#cb10-207" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> <span class="fu">filter</span>(top10_songs, highlight <span class="sc">==</span> <span class="st">"Other Top-10 Songs"</span>), <span class="at">alpha =</span> <span class="fl">0.4</span>) <span class="sc">+</span></span>
+<span id="cb10-208"><a href="#cb10-208" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Render the colored highlight lines on top</span></span>
+<span id="cb10-209"><a href="#cb10-209" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> <span class="fu">filter</span>(top10_songs, highlight <span class="sc">!=</span> <span class="st">"Other Top-10 Songs"</span>), <span class="at">linewidth =</span> <span class="fl">1.2</span>) <span class="sc">+</span></span>
+<span id="cb10-210"><a href="#cb10-210" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_reverse</span>() <span class="sc">+</span></span>
+<span id="cb10-211"><a href="#cb10-211" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(</span>
+<span id="cb10-212"><a href="#cb10-212" aria-hidden="true" tabindex="-1"></a>    <span class="at">values =</span> <span class="fu">c</span>(</span>
+<span id="cb10-213"><a href="#cb10-213" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Madonna - Music (Fastest to #1)"</span> <span class="ot">=</span> <span class="st">"#ff7ebb"</span>,</span>
+<span id="cb10-214"><a href="#cb10-214" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Lonestar - Amazed (Slowest to #1)"</span> <span class="ot">=</span> <span class="st">"#70d6ff"</span>,</span>
+<span id="cb10-215"><a href="#cb10-215" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Creed - Higher (Longest Top-10 Run)"</span> <span class="ot">=</span> <span class="st">"#c77dff"</span>,</span>
+<span id="cb10-216"><a href="#cb10-216" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Other Top-10 Songs"</span> <span class="ot">=</span> <span class="st">"#d1d5db"</span></span>
+<span id="cb10-217"><a href="#cb10-217" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb10-218"><a href="#cb10-218" aria-hidden="true" tabindex="-1"></a>    <span class="at">breaks =</span> <span class="fu">c</span>(</span>
+<span id="cb10-219"><a href="#cb10-219" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Madonna - Music (Fastest to #1)"</span>,</span>
+<span id="cb10-220"><a href="#cb10-220" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Lonestar - Amazed (Slowest to #1)"</span>,</span>
+<span id="cb10-221"><a href="#cb10-221" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Creed - Higher (Longest Top-10 Run)"</span></span>
+<span id="cb10-222"><a href="#cb10-222" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb10-223"><a href="#cb10-223" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb10-224"><a href="#cb10-224" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb10-225"><a href="#cb10-225" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Top-10 Songs on the Billboard Chart"</span>,</span>
+<span id="cb10-226"><a href="#cb10-226" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Highlighting three notable songs"</span>,</span>
+<span id="cb10-227"><a href="#cb10-227" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Week on Chart"</span>,</span>
+<span id="cb10-228"><a href="#cb10-228" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Rank (Reversed)"</span>,</span>
+<span id="cb10-229"><a href="#cb10-229" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"Notable Songs"</span></span>
+<span id="cb10-230"><a href="#cb10-230" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb10-231"><a href="#cb10-231" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
