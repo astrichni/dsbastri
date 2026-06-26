@@ -1,0 +1,34 @@
+project:
+  type: website
+  output-dir: _site
+  render:
+    - index.qmd
+    - analysis.qmd
+    - analysis-2.qmd
+
+website:
+  title: "Astri's Data Analytics"
+  description: "A showcase of sports and music data visualization projects."
+  navbar:
+    background: primary
+    search: true
+    left:
+      - href: index.qmd
+        text: NBA Scorigami
+      - href: analysis.qmd
+        text: Million Songs
+      - href: analysis-2.qmd
+        text: Billboard Charts
+
+format:
+  html:
+    theme:
+      light: flatly
+      dark: darkly
+    css: styles.css
+    toc: true
+    toc-depth: 3
+    toc-title: "On this page"
+    code-fold: show
+    code-tools: true
+    page-layout: article

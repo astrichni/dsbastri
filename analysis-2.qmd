@@ -154,6 +154,16 @@ bind_rows(
 ) %>%
   select(note, artist, track, first_rank, best_rank, first_week_at_best, total_weeks)
 ```
+
+::: {.insights-box}
+### Year 2000 Billboard Chart Insights
+An analysis of the **317 tracks** entering the Billboard Hot 100 in the year 2000 reveals three standout records:
+
+*   **Fastest Climb to #1:** Madonna’s *"Music"* reached the top spot in just **6 weeks** (entering the chart at #41).
+*   **Slowest Climb to #1:** Lonestar’s *"Amazed"* took **40 weeks** of climbing to reach #1 (entering at #81).
+*   **Longest Run on Chart:** Creed’s *"Higher"* set the endurance record, spending **57 weeks** on the chart (peaking at #7).
+:::
+
 ```{r}
 # Filter to only the songs that reached the top 10 at some point
 top10_songs <- billboard_long %>%
@@ -178,10 +188,10 @@ ggplot(top10_songs, aes(x = week_num, y = rank, group = interaction(artist, trac
   scale_y_reverse() +
   scale_color_manual(
     values = c(
-      "Madonna - Music (Fastest to #1)" = "#E41A1C",
-      "Lonestar - Amazed (Slowest to #1)" = "#377EB8",
-      "Creed - Higher (Longest Top-10 Run)" = "#4DAF4C",
-      "Other Top-10 Songs" = "#D3D3D3"
+      "Madonna - Music (Fastest to #1)" = "#ff7ebb",
+      "Lonestar - Amazed (Slowest to #1)" = "#70d6ff",
+      "Creed - Higher (Longest Top-10 Run)" = "#c77dff",
+      "Other Top-10 Songs" = "#d1d5db"
     ),
     breaks = c(
       "Madonna - Music (Fastest to #1)",

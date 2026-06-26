@@ -3,6 +3,8 @@ analysis_cache/
 .quarto
 quarto-1_files
 
+_site/
+
 analysis-2_files
 analysis-2_cache/
 .quarto
@@ -10,3 +12,6 @@ quarto-1_files
 
 /.quarto/
 **/*.quarto_ipynb
+
+scores_files
+scores_cache/

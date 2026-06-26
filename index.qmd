@@ -1,0 +1,361 @@
+---
+title: "NBA Scorigami"
+author: "Astri Cahyani"
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r}
+#| message: false
+#| warning: false
+library(tidyverse)
+```
+
+```{r}
+#| message: false
+#| warning: false
+games <- read_csv("data/Games.csv")
+```
+
+::: {.insights-box}
+### What is Scorigami?
+A **Scorigami** is a final score combination that has occurred for the first time in league history. Out of **73,277 NBA games** in this dataset, teams have registered **5,119 unique score combinations**.
+
+*   **Home-Court Advantage:** Home teams won **61.57%** of all games, visible in the higher density of scores below the diagonal line ($Home\ PTS > Visitor\ PTS$).
+*   **Most Common Score:** **105 - 99** (a home-team victory) is the most frequent score, occurring **100 times**.
+*   **Extreme Outlier:** The highest-scoring game occurred on Dec 13, 1983, when the Detroit Pistons defeated the Denver Nuggets **186 - 184** (370 total points) in triple overtime.
+:::
+
+::: {.scorigami-wrapper}
+```{r}
+#| message: false
+#| warning: false
+#| fig-width: 10
+#| fig-height: 10
+library(plotly)
+
+# Filter out empty or incomplete games
+games_filtered <- games %>%
+  filter(homeScore > 0, awayScore > 0)
+
+# Compute counts and details for tooltip
+score_counts_interactive <- games_filtered %>%
+  group_by(homeScore, awayScore) %>%
+  summarize(
+    n = n(),
+    first_date = format(min(gameDate), "%b %d, %Y"),
+    last_date = format(max(gameDate), "%b %d, %Y"),
+    sample_teams = paste0(first(paste(hometeamCity, hometeamName)), " vs ", first(paste(awayteamCity, awayteamName))),
+    .groups = "drop"
+  ) %>%
+  mutate(
+    tooltip_text = paste0(
+      "Score: ", homeScore, " - ", awayScore, "\n",
+      "Occurrences: ", n, "\n",
+      "First Achieved: ", first_date, "\n",
+      "Most Recent: ", last_date, "\n",
+      "Example: ", sample_teams
+    )
+  )
+
+# Plot
+p <- ggplot(score_counts_interactive, aes(x = homeScore, y = awayScore)) +
+  geom_tile(aes(fill = n, text = tooltip_text), width = 0.95, height = 0.95) +
+  geom_abline(intercept = 0, slope = 1, color = "white", linewidth = 1.2) +
+  scale_fill_viridis_c(
+    option = "inferno", 
+    trans = "log10", 
+    name = "Count",
+    breaks = c(1, 10, 100),
+    labels = c("1", "10", "100+")
+  ) +
+  scale_x_continuous(
+    breaks = seq(20, 180, by = 20), 
+    minor_breaks = seq(10, 200, by = 2),
+    limits = c(15, 195),
+    expand = c(0, 0)
+  ) +
+  scale_y_continuous(
+    breaks = seq(20, 180, by = 20), 
+    minor_breaks = seq(10, 200, by = 2),
+    limits = c(15, 195),
+    expand = c(0, 0)
+  ) +
+  labs(
+    title = "NBA Scorigami",
+    x = "Home PTS",
+    y = "Visitor PTS"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 22, color = "#0B1D3A", hjust = 0, margin = margin(b = 6)),
+    axis.title = element_text(face = "bold", size = 14, color = "grey20"),
+    axis.text = element_text(size = 12, color = "grey30"),
+    panel.background = element_rect(fill = "#EAEAEA", color = NA),
+    panel.grid.major = element_line(color = "white", linewidth = 0.4),
+    panel.grid.minor = element_line(color = "white", linewidth = 0.15),
+    plot.background = element_rect(fill = "white", color = NA),
+    aspect.ratio = 1,
+    legend.position = "right"
+  )
+
+# Render plotly widget
+ggplotly(p, tooltip = "text") %>%
+  layout(
+    xaxis = list(scaleanchor = "y", scaleratio = 1),
+    margin = list(t = 50)
+  )
+```
+:::
+
+## Scoring Trends and Scorigami Rates
+
+How does the pace and scoring of the game affect how often we see a new final score? The charts below illustrate the relationship between the league's average combined points per game and the rate of new Scorigami discoveries from 1946 to 2026.
+
+::: {.scorigami-wrapper}
+```{r}
+#| message: false
+#| warning: false
+#| fig-width: 9
+#| fig-height: 7
+
+# Calculate yearly average combined points
+yearly_scoring <- games %>%
+  filter(homeScore > 0, awayScore > 0) %>%
+  mutate(year = year(gameDate)) %>%
+  group_by(year) %>%
+  summarize(
+    avg_total_pts = mean(homeScore + awayScore),
+    .groups = "drop"
+  )
+
+# Calculate new scorigamis per year
+new_scorigamis <- games %>%
+  filter(homeScore > 0, awayScore > 0) %>%
+  arrange(gameDate) %>%
+  distinct(homeScore, awayScore, .keep_all = TRUE) %>%
+  mutate(year = year(gameDate)) %>%
+  group_by(year) %>%
+  summarize(new_scores_count = n(), .groups = "drop")
+
+# Merge
+merged_stats <- full_join(yearly_scoring, new_scorigamis, by = "year") %>%
+  replace_na(list(new_scores_count = 0)) %>%
+  pivot_longer(
+    cols = c(avg_total_pts, new_scores_count),
+    names_to = "metric",
+    values_to = "value"
+  ) %>%
+  mutate(
+    metric_label = factor(
+      metric,
+      levels = c("avg_total_pts", "new_scores_count"),
+      labels = c("Average Combined Points per Game", "New Scorigami Combinations Discovered")
+    )
+  )
+
+# Plot
+ggplot(merged_stats, aes(x = year, y = value, fill = metric_label, color = metric_label)) +
+  geom_area(alpha = 0.15, position = "identity") +
+  geom_line(linewidth = 1.2) +
+  facet_wrap(~metric_label, scales = "free_y", ncol = 1) +
+  scale_x_continuous(breaks = seq(1946, 2026, by = 10)) +
+  scale_fill_manual(values = c("Average Combined Points per Game" = "#70d6ff", "New Scorigami Combinations Discovered" = "#ff7ebb")) +
+  scale_color_manual(values = c("Average Combined Points per Game" = "#3b82f6", "New Scorigami Combinations Discovered" = "#db2777")) +
+  labs(
+    title = "NBA Scoring Pace vs. Scorigami Rates (1946 - 2026)",
+    subtitle = "Spikes in game pace and scoring trigger waves of newly discovered score combinations",
+    x = "Year",
+    y = NULL,
+    caption = "Data source: kaggle.com"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 16, color = "#0B1D3A"),
+    plot.subtitle = element_text(size = 11, color = "grey30"),
+    strip.text = element_text(face = "bold", size = 11, color = "grey20", hjust = 0),
+    panel.background = element_rect(fill = "#F9FAFB", color = NA),
+    panel.grid.major = element_line(color = "white", linewidth = 0.5),
+    panel.grid.minor = element_line(color = "white", linewidth = 0.2),
+    plot.background = element_rect(fill = "white", color = NA),
+    legend.position = "none"
+  )
+```
+:::
+
+::: {.insights-box}
+### Pace and Scorigami Insights
+*   **The Shot Clock Jump (1954):** The introduction of the 24-second shot clock in 1954 caused average combined scores to surge from **159 to over 190 points** in just a few seasons, causing a massive wave of new final scores (peaking at **178 new combinations** in a single year).
+*   **The Scorigami Drought (1970s–2000s):** As the league's pace stabilized and the grid of common scores filled up, the discovery of new Scorigamis dropped below **30 per year** in the early 2000s, coinciding with a low-scoring defensive era (averaging around **190 combined points**).
+*   **The Modern Resurgence (2010s–2020s):** High-volume three-point shooting and modern transition play have pushed the average combined points up to **225+**. This modern offensive explosion has unlocked previously untouched high-scoring regions, causing new Scorigami rates to double to **40+ per year**.
+:::
+
+## Deep Dive: NBA Scoring Analytics
+
+To better understand the mechanics of NBA Scorigami, let's explore three key visualizations detailing score frequencies, decade-by-decade probability patterns, and score margins.
+
+### 1. The Most Frequent Scores
+While Scorigamis represent the *first* time a score occurs, most NBA games cluster around a few very common score combinations.
+
+::: {.scorigami-wrapper}
+```{r}
+#| message: false
+#| warning: false
+#| fig-width: 9
+#| fig-height: 5
+
+top_scores_interactive <- games_filtered %>%
+  count(homeScore, awayScore, sort = TRUE) %>%
+  head(15) %>%
+  mutate(
+    score_label = paste(homeScore, "-", awayScore),
+    score_label = reorder(score_label, n),
+    tooltip_text = paste0("Score: ", homeScore, " - ", awayScore, "\nTotal Occurrences: ", n)
+  )
+
+p_top <- ggplot(top_scores_interactive, aes(y = score_label, x = n, fill = n, text = tooltip_text)) +
+  geom_bar(stat = "identity", width = 0.7) +
+  scale_fill_gradient(low = "#ff7ebb", high = "#c77dff") +
+  labs(
+    title = "Top 15 Most Frequent Final Scores",
+    x = "Total Games Played",
+    y = "Final Score (Home - Away)"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    plot.title = element_text(face = "bold", size = 15, color = "#0B1D3A"),
+    panel.background = element_rect(fill = "#F9FAFB", color = NA),
+    panel.grid.major.y = element_blank(),
+    panel.grid.major.x = element_line(color = "white", linewidth = 0.5)
+  )
+
+ggplotly(p_top, tooltip = "text") %>%
+  layout(margin = list(l = 80))
+```
+:::
+
+### 2. Scorigami Probability by Decade
+How hard is it to find a Scorigami? In the early days of the league, nearly every game resulted in a new score. By the 2010s, it became extremely rare. However, the 2020s are experiencing a sudden resurgence.
+
+::: {.scorigami-wrapper}
+```{r}
+#| message: false
+#| warning: false
+#| fig-width: 9
+#| fig-height: 5
+
+scorigami_pct <- games_filtered %>%
+  arrange(gameDate) %>%
+  mutate(
+    score_id = paste(homeScore, awayScore),
+    is_scorigami = !duplicated(score_id),
+    decade = paste0(floor(year(gameDate) / 10) * 10, "s")
+  ) %>%
+  group_by(decade) %>%
+  summarize(
+    total_games = n(),
+    scorigamis = sum(is_scorigami),
+    pct_scorigami = scorigamis / total_games * 100,
+    .groups = "drop"
+  ) %>%
+  mutate(
+    tooltip_text = paste0(
+      "Decade: ", decade, "\n",
+      "Total Games: ", scales::comma(total_games), "\n",
+      "New Scorigamis: ", scorigamis, "\n",
+      "Probability: ", sprintf("%.2f%%", pct_scorigami)
+    )
+  )
+
+p_prob <- ggplot(scorigami_pct, aes(x = decade, y = pct_scorigami, fill = pct_scorigami, text = tooltip_text)) +
+  geom_bar(stat = "identity", width = 0.6) +
+  scale_fill_gradient(low = "#c77dff", high = "#ff7ebb") +
+  labs(
+    title = "Percentage of Games Resulting in a Scorigami",
+    x = "Decade",
+    y = "% of Games"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    plot.title = element_text(face = "bold", size = 15, color = "#0B1D3A"),
+    panel.background = element_rect(fill = "#F9FAFB", color = NA),
+    panel.grid.major.x = element_blank()
+  )
+
+ggplotly(p_prob, tooltip = "text")
+```
+:::
+
+### 3. Distribution of Victory Margins
+Due to home-court advantage, victory margins are heavily skewed in favor of the home team, with home wins outpacing visitor wins **61.57% to 38.43%**.
+
+::: {.scorigami-wrapper}
+```{r}
+#| message: false
+#| warning: false
+#| fig-width: 9
+#| fig-height: 5
+
+margin_counts <- games_filtered %>%
+  mutate(
+    margin = homeScore - awayScore,
+    winner = if_else(margin > 0, "Home Win", "Away Win")
+  ) %>%
+  count(margin, winner) %>%
+  mutate(
+    tooltip_text = paste0(
+      "Victory Margin: ", abs(margin), " pts (", winner, ")\n",
+      "Total Games: ", n
+    )
+  )
+
+p_margin <- ggplot(margin_counts, aes(x = margin, y = n, fill = winner, text = tooltip_text)) +
+  geom_bar(stat = "identity", width = 0.9, alpha = 0.8) +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "grey40", linewidth = 1) +
+  scale_fill_manual(values = c("Home Win" = "#70d6ff", "Away Win" = "#ff7ebb")) +
+  labs(
+    title = "NBA Margin of Victory Distribution",
+    x = "Margin (Home PTS - Visitor PTS)",
+    y = "Number of Games",
+    fill = "Winner"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 15, color = "#0B1D3A"),
+    panel.background = element_rect(fill = "#F9FAFB", color = NA),
+    legend.position = "none"
+  )
+
+ggplotly(p_margin, tooltip = "text")
+```
+:::
+
+::: {.insights-box}
+### Deep Dive Insights
+*   **The 6-Point Sweet Spot:** The most common final score in NBA history is **105 - 99** (and its close neighbor **108 - 101**), both representing a 6-point victory margin.
+*   **Decade U-Turn:** The probability of a Scorigami dropped continuously for 70 years, hitting a low of **1.65%** in the 2010s. However, the offensive explosion of the 2020s has reversed this trend, nearly doubling the probability to **3.12%**.
+*   **The Home Shift:** The distribution of victory margins is centered at a mean of **+3.54 points** in favor of the home team, indicating the strength of home-court advantage in final game outcomes.
+:::
+
+## Interactive Scorigami Explorer
+
+### Features
+*   **Filter by Team**: Select a specific NBA franchise to view only their final score combinations.
+*   **Filter by Game Type**: Isolate regular season matches, Play-in Tournaments, or NBA Finals.
+*   **Time-based Selection**: Use the slider to filter scores within specific decades or seasons.
+*   **Hover Tooltips**: Inspect individual scores to see occurrences, first/last dates achieved, and a sample game matchup.
+
+### How to Run Locally
+
+To launch the dashboard locally in your R console by running:
+
+```r
+shiny::runApp("app.R")
+```
+
+
+
